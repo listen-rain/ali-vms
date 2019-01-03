@@ -1,0 +1,17 @@
+{
+    "name": "listen/ali-vms",
+    "description": "ali vms package",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "zhufengwei",
+            "email": "zhufengwei@aliyun.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=5.5.9",
+        "listen/ali-openapi": "dev-master",
+        "guzzlehttp/guzzle": "~6.2.3"
+    }
+}
