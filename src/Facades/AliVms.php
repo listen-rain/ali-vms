@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Facade;
 
 class AliVms extends Facade
 {
-    public function getFacadeAccessor()
+    public static function getFacadeAccessor()
     {
         return 'alivms';
     }
