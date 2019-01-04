@@ -8,10 +8,23 @@
             "email": "zhufengwei@aliyun.com"
         }
     ],
+    "autoload": {
+        "psr-4": {
+            "Listen\\AliVms\\": "src/"
+        }
+    },
     "minimum-stability": "dev",
     "require": {
         "php": ">=5.5.9",
         "listen/ali-openapi": "dev-master",
-        "guzzlehttp/guzzle": "~6.2.3"
+        "guzzlehttp/guzzle": "~6.2.3",
+        "listen/restapi": "dev-master",
+        "monolog/monolog": "*"
+    },
+    "repositories": {
+        "listen-restapi": {
+            "type": "vcs",
+            "url": "https://github.com/listen-rain/restapi.git"
+        }
     }
 }
