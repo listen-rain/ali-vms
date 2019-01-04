@@ -16,15 +16,10 @@
     "minimum-stability": "dev",
     "require": {
         "php": ">=5.5.9",
-        "listen/ali-openapi": "dev-master",
+        "listen/ali-openapi": "~1.0",
         "guzzlehttp/guzzle": "~6.2.3",
-        "listen/restapi": "dev-master",
         "monolog/monolog": "*"
     },
     "repositories": {
-        "listen-restapi": {
-            "type": "vcs",
-            "url": "https://github.com/listen-rain/restapi.git"
-        }
     }
 }
