@@ -1,0 +1,25 @@
+{
+    "name": "listen/ali-vms",
+    "description": "ali vms package",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "zhufengwei",
+            "email": "zhufengwei@aliyun.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Listen\\AliVms\\": "src/"
+        }
+    },
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=5.5.9",
+        "listen/ali-openapi": "~1.0",
+        "guzzlehttp/guzzle": "~6.2.3",
+        "monolog/monolog": "*"
+    },
+    "repositories": {
+    }
+}
