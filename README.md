@@ -1,2 +1,51 @@
-# ali-vms
-ali vms package for laravel 
+# Ali Vms
+Ali Vms Package For Laravel
+
+## Usage
+
+Composer Install
+
+```sh
+composer require listen/ali-vms
+```
+
+Publish And Update Config File
+
+```sh
+php artisan vendor:publish
+```
+
+Then Edit config/ali-vms.php
+
+```php
+<?php
+
+return [
+    'uri'         => env('ALI_VMS_URI', 'http://nls-gateway.cn-shanghai.aliyuncs.com/stream/v1/asr'),  // Request Uri
+    'appkey'      => env('ALI_VMS_APPKEY', ''),   // APP KEY                                      
+    'host'        => env('ALI_VMS_HOST', 'nls-gateway.cn-shanghai.aliyuncs.com'),  // Host
+    'timeout'     => 3,
+    'log_file'    => storage_path('logs/alivms.log'), // Log File Path
+    'log_channel' => 'ALI-VMS',
+];
+```
+
+Send Request
+
+```
+# use tmp file
+$file = $request->file('audio');
+dd(AliVms::voiceDetection($file->getRealPath()));
+
+# use file 
+dd(AliVms::voiceDetection('path/to/file.pcm'));
+```
+
+## Contact Me
+
+Email : zhufengwei@aliyun.com
+
+Wechat: w15275049388
+
+
+
