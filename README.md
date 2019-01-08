@@ -30,6 +30,21 @@ return [
 ];
 ```
 
+Update config/app.php
+```
+providers => [
+    ......
+    Listen\AliVms\AliVmsServiceProvider::class,
+],
+
+......
+
+aliases => [
+    ......
+    'AliVms' => Listen\AliVms\Facades\AliVms::class,
+] 
+```
+
 Send Request
 
 ```
