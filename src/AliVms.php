@@ -150,6 +150,8 @@ class AliVms
         } catch (\Exception $e) {
 
             $this->addlog('alivms', $this->config->get('alivms.uri'), [$file], $e->getMessage(), $e->getCode());
+
+            return false;
         }
     }
 
