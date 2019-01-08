@@ -47,7 +47,7 @@ aliases => [
 
 Send Request
 
-```
+```php
 # use tmp file
 $file = $request->file('audio');
 dd(AliVms::voiceDetection($file->getRealPath()));
