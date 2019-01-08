@@ -63,6 +63,7 @@ class AliVms
     /**
      * @date   2019/1/4
      * @author <zhufengwei@100tal.com>
+     *
      * @param string $file
      *
      * @return $this
@@ -77,6 +78,7 @@ class AliVms
     /**
      * @date   2019/1/4
      * @author <zhufengwei@100tal.com>
+     *
      * @param string $token
      *
      * @return $this
@@ -86,8 +88,8 @@ class AliVms
         $this->headers = [
             'X-NLS-Token'    => $token ?: AliOpenapi::getToken()->Id,
             'Content-type'   => 'application/octet-stream',
-            'Content-Length' => strlen($this->file),
-            'Host'           => $this->config->get('alivms.host')
+            'Content-Length' => strval(strlen(file_get_contents($this->file))),
+            'Host'           => $this->config->get('alivms.host') ?: 'nls-gateway.cn-shanghai.aliyuncs.com'
         ];
 
         return $this;
@@ -96,6 +98,7 @@ class AliVms
     /**
      * @date   2019/1/4
      * @author <zhufengwei@100tal.com>
+     *
      * @param string $appkey
      *
      * @return $this
@@ -106,7 +109,7 @@ class AliVms
             'multipart' => [
                 [
                     'name'     => 'audio',
-                    'contents' => fopen($this->file, 'r')
+                    'contents' => file_get_contents($this->file)
                 ]
             ],
             'query'     => [
@@ -122,6 +125,7 @@ class AliVms
     /**
      * @date   2019/1/4
      * @author <zhufengwei@100tal.com>
+     *
      * @param string $file
      *
      * @return mixed
@@ -133,15 +137,16 @@ class AliVms
             $this->setFile($file)->setHeader()->setOption();
         }
 
-         try {
+        try {
             // first
-            // $request = new Request('POST', $this->config->get('alivms.uri'), $this->headers);
-            // $result  = $this->client->send($request, $this->options);
+            $request = new Request('POST', $this->config->get('alivms.uri'), $this->headers);
+            $result  = $this->client->send($request, $this->options);
 
             // secounds
-            $result = $this->client->request('POST', $this->config->get('alivms.uri'), $this->options);
+            // $result = $this->client->request('POST', $this->config->get('alivms.uri'), $this->options);
 
             return json_decode($result->getBody()->getContents());
+
         } catch (\Exception $e) {
 
             $this->addlog('alivms', $this->config->get('alivms.uri'), [$file], $e->getMessage(), $e->getCode());
@@ -151,6 +156,7 @@ class AliVms
     /**
      * @date   2019/1/4
      * @author <zhufengwei@100tal.com>
+     *
      * @param $module
      * @param $uri
      * @param $request
