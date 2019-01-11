@@ -1,5 +1,6 @@
 {
     "name": "listen/ali-vms",
+    "version": "1.0.1",
     "description": "ali vms package",
     "license": "MIT",
     "authors": [

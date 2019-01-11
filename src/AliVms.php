@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: <zhufengwei@100tal.com>
- * Date: 2019/1/3
- * Time: 16:47
- */
 
 namespace Listen\AliVms;
 
