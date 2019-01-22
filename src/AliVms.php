@@ -6,6 +6,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request;
 use AliOpenapi;
 use Illuminate\Config\Repository;
+use Mockery\Exception;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\RotatingFileHandler;
@@ -13,6 +14,8 @@ use Monolog\Formatter\LineFormatter;
 
 class AliVms
 {
+    const BASENAME = 'alivms.';
+
     /**
      * @var \GuzzleHttp\Client
      */
@@ -56,7 +59,7 @@ class AliVms
 
     /**
      * @date   2019/1/4
-     * @author <zhufengwei@aliyun.com>
+     * @author <zhufengwei@100tal.com>
      *
      * @param string $file
      *
@@ -71,7 +74,7 @@ class AliVms
 
     /**
      * @date   2019/1/4
-     * @author <zhufengwei@aliyun.com>
+     * @author <zhufengwei@100tal.com>
      *
      * @param string $token
      *
@@ -91,7 +94,7 @@ class AliVms
 
     /**
      * @date   2019/1/4
-     * @author <zhufengwei@aliyun.com>
+     * @author <zhufengwei@100tal.com>
      *
      * @param string $appkey
      *
@@ -107,7 +110,7 @@ class AliVms
                 ]
             ],
             'query'     => [
-                'appkey' => $appkey ?: $this->config->get('alivms.appkey')
+                'appkey' => $appkey ?: $this->setAppkey()
             ],
             'timeout'   => $this->config->get('alivms.timeout'),
             'headers'   => $this->headers
@@ -117,8 +120,28 @@ class AliVms
     }
 
     /**
-     * @date   2019/1/4
+     * @date   2019/1/22
      * @author <zhufengwei@aliyun.com>
+     *
+     * @return string
+     */
+    private function setAppkey(): string
+    {
+        $appkeys = $this->config->get('alivms.appkey');
+
+        if (!is_array($appkeys)) {
+            $appkeysArr = explode(',', $appkeys);
+            if (empty($appkeysArr)) {
+                throw new Exception('AppKey Con\'t Empty!');
+            }
+
+            return $appkeysArr[array_rand($appkeysArr, 1)];
+        }
+    }
+
+    /**
+     * @date   2019/1/4
+     * @author <zhufengwei@100tal.com>
      *
      * @param string $file
      *
@@ -133,13 +156,20 @@ class AliVms
 
         try {
             // first
-            $request = new Request('POST', $this->config->get('alivms.uri'), $this->headers);
-            $result  = $this->client->send($request, $this->options);
+            $request  = new Request('POST', $this->config->get('alivms.uri'), $this->headers);
+            $response = $this->client->send($request, $this->options);
 
             // secounds
             // $result = $this->client->request('POST', $this->config->get('alivms.uri'), $this->options);
 
-            return json_decode($result->getBody()->getContents());
+            $result = json_decode($response->getBody()->getContents());
+            if ($result->status === 20000000) {
+                return $result->result;
+            }
+
+            $this->addlog('alivms', $this->config->get('alivms.uri'), [$file], $result->result, $result->status);
+
+            return false;
 
         } catch (\Exception $e) {
 
@@ -151,7 +181,7 @@ class AliVms
 
     /**
      * @date   2019/1/4
-     * @author <zhufengwei@aliyun.com>
+     * @author <zhufengwei@100tal.com>
      *
      * @param $module
      * @param $uri
@@ -161,21 +191,20 @@ class AliVms
      */
     public function addlog(string $module, string $uri, array $request, string $response, int $code)
     {
-        $logger      = new Logger($this->config->get('alivms.log_channel'));
-        $eventRotate = new RotatingFileHandler($this->config->get('alivms.log_file'), Logger::INFO);
-        $eventRotate->setFormatter(new LineFormatter("[%datetime%] [%level_name%] %channel% - %message% %extra%\n"));
-        $logger->pushHandler($eventRotate);
-        $logger->pushProcessor(function ($record) use ($request, $uri, $response, $code) {
-            $record['extra'] = [
-                'uri'      => $uri,
-                'request'  => $request,
-                'response' => $response,
-                'code'     => $code
-            ];
+        $logger    = new Logger($this->config->get('alivms.log_channel'));
+        $file_name = $this->config->get('alivms.log_file');
 
+        try {
+            $logger->pushHandler(new StreamHandler($file_name, Logger::INFO, false));
+        } catch (\Exception $e) {
+            $logger->info('pushHandlerError', $e->getMessage());
+        }
+
+        $logger->pushProcessor(function ($record) use ($request, $uri, $response, $code) {
+            $record['extra'] = compact('uri', 'request', 'response', 'code');
             return $record;
         });
 
-        $logger->addInfo($module);
+        $logger->addError(self::BASENAME . $module);
     }
 }

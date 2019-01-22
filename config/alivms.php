@@ -6,5 +6,5 @@ return [
     'host'        => env('ALI_VMS_HOST', 'nls-gateway.cn-shanghai.aliyuncs.com'),
     'timeout'     => 3,
     'log_file'    => storage_path('logs/alivms.log'),
-    'log_channel' => 'ALI-VMS',
+    'log_channel' => 'alivms',
 ];
