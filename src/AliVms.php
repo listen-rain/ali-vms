@@ -162,15 +162,7 @@ class AliVms
             // secounds
             // $result = $this->client->request('POST', $this->config->get('alivms.uri'), $this->options);
 
-            $result = json_decode($response->getBody()->getContents());
-            if ($result->status === 20000000) {
-                return $result->result;
-            }
-
-            $this->addlog('alivms', $this->config->get('alivms.uri'), [$file], $result->result, $result->status);
-
-            return false;
-
+            return json_decode($response->getBody()->getContents());
         } catch (\Exception $e) {
 
             $this->addlog('alivms', $this->config->get('alivms.uri'), [$file], $e->getMessage(), $e->getCode());
