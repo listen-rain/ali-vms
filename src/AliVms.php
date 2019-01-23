@@ -59,7 +59,7 @@ class AliVms
 
     /**
      * @date   2019/1/4
-     * @author <zhufengwei@100tal.com>
+     * @author <zhufengwei@aliyun.com>
      *
      * @param string $file
      *
@@ -74,7 +74,7 @@ class AliVms
 
     /**
      * @date   2019/1/4
-     * @author <zhufengwei@100tal.com>
+     * @author <zhufengwei@aliyun.com>
      *
      * @param string $token
      *
@@ -94,7 +94,7 @@ class AliVms
 
     /**
      * @date   2019/1/4
-     * @author <zhufengwei@100tal.com>
+     * @author <zhufengwei@aliyun.com>
      *
      * @param string $appkey
      *
@@ -141,7 +141,7 @@ class AliVms
 
     /**
      * @date   2019/1/4
-     * @author <zhufengwei@100tal.com>
+     * @author <zhufengwei@aliyun.com>
      *
      * @param string $file
      *
@@ -181,7 +181,7 @@ class AliVms
 
     /**
      * @date   2019/1/4
-     * @author <zhufengwei@100tal.com>
+     * @author <zhufengwei@aliyun.com>
      *
      * @param $module
      * @param $uri
