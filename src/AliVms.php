@@ -106,7 +106,8 @@ class AliVms
             'multipart' => [
                 [
                     'name'     => 'audio',
-                    'contents' => file_get_contents($this->file)
+                    'contents' => file_get_contents($this->file),
+                    'headers'  => $this->headers
                 ]
             ],
             'query'     => [
