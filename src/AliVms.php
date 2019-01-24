@@ -42,6 +42,13 @@ class AliVms
     protected $file;
 
     /**
+     * @var array
+     */
+    protected $query = [
+        'appkey' => ''
+    ];
+
+    /**
      * AliVms constructor.
      *
      * @param \Illuminate\Config\Repository $config
@@ -55,6 +62,33 @@ class AliVms
                 'base_uri' => '',
                 'timeout'  => $this->config->get('alivms.timeout'),
             ]);
+    }
+
+    /**
+     * @date   2019/1/24
+     * @author <zhufengwei@aliyun.com>
+     * @param array $query
+     *
+     * @return $this
+     */
+    public function setQuery(array $query)
+    {
+        $setable = [
+            'appkey',
+            'format',
+            'sample_rate',
+            'enable_punctuation_prediction',
+            'enable_inverse_text_normalization',
+            'enable_voice_detection'
+        ];
+
+        foreach ($query as $key => $value) {
+            if (in_array($key, $setable)) {
+                $this->query[$key] = $value;
+            }
+        }
+
+        return $this;
     }
 
     /**
@@ -110,9 +144,10 @@ class AliVms
                     'headers'  => $this->headers
                 ]
             ],
-            'query'     => [
-                'appkey' => $appkey ?: $this->setAppkey()
-            ],
+            'query'     => array_merge($this->query, [
+                'appkey' => $appkey ?: ($this->query['appkey'] ?: $this->setAppkey())
+            ]),
+
             'timeout'   => $this->config->get('alivms.timeout'),
             'headers'   => $this->headers
         ];
