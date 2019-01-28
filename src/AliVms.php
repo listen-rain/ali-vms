@@ -49,6 +49,11 @@ class AliVms
     ];
 
     /**
+     * @var bool
+     */
+    private $dingUrl = '';
+
+    /**
      * AliVms constructor.
      *
      * @param \Illuminate\Config\Repository $config
@@ -74,6 +79,21 @@ class AliVms
     public function setToken(string $token)
     {
         $this->token = $token;
+
+        return $this;
+    }
+
+    /**
+     * @date   2019/1/28
+     * @author <zhufengwei@aliyun.com>
+     *
+     * @param string $url
+     *
+     * @return $this
+     */
+    public function setDingDingUrl(string $url)
+    {
+        $this->dingUrl = $url;
 
         return $this;
     }
@@ -172,7 +192,7 @@ class AliVms
         }
 
         try {
-            $request = $this->getRequest();
+            $request  = $this->getRequest();
             $response = $this->send($request);
 
             return json_decode($response, true);
@@ -216,6 +236,7 @@ class AliVms
     /**
      * @date   2019/1/28
      * @author <zhufengwei@aliyun.com>
+     *
      * @param string $request
      */
     public function send(string $request)

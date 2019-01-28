@@ -7,4 +7,5 @@ return [
     'timeout'     => 120,
     'log_file'    => storage_path('logs/alivms.log'),
     'log_channel' => 'alivms',
+    'dingding_url' => env('DINGDING_URL', '')
 ];
