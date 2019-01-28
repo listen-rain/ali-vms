@@ -17,8 +17,6 @@
     "minimum-stability": "dev",
     "require": {
         "php": ">=5.5.9",
-        "listen/ali-openapi": "~1.0",
-        "guzzlehttp/guzzle": "~6.2.3",
         "monolog/monolog": "*"
     },
     "repositories": {

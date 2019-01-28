@@ -2,24 +2,14 @@
 
 namespace Listen\AliVms;
 
-use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\Request;
-use AliOpenapi;
 use Illuminate\Config\Repository;
 use Mockery\Exception;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
-use Monolog\Handler\RotatingFileHandler;
-use Monolog\Formatter\LineFormatter;
 
 class AliVms
 {
     const BASENAME = 'alivms.';
-
-    /**
-     * @var \GuzzleHttp\Client
-     */
-    protected $client;
 
     /**
      * @var \Illuminate\Config\Repository
@@ -27,25 +17,35 @@ class AliVms
     protected $config;
 
     /**
-     * @var Array
+     * @var array
      */
     protected $headers = [];
 
     /**
-     * @var Array
-     */
-    protected $options = [];
-
-    /**
-     * @var FilePath
+     * @var string
      */
     protected $file;
 
     /**
+     * @var string
+     */
+    protected $token;
+
+    /**
      * @var array
      */
-    protected $query = [
-        'appkey' => ''
+    protected $query = [];
+
+    /**
+     * @var array
+     */
+    private $setable = [
+        'appkey',
+        'format',
+        'sample_rate',
+        'enable_punctuation_prediction',
+        'enable_inverse_text_normalization',
+        'enable_voice_detection'
     ];
 
     /**
@@ -55,38 +55,25 @@ class AliVms
      */
     public function __construct(Repository $config)
     {
-        $this->config = $config;
-
-        $this->client = new Client(
-            [
-                'base_uri' => '',
-                'timeout'  => $this->config->get('alivms.timeout'),
-            ]);
+        $this->config      = $config;
+        $this->uri         = $this->config->get('alivms.uri', 'http://nls-gateway.cn-shanghai.aliyuncs.com/stream/v1/asr');
+        $this->appkey      = $this->setAppkey();
+        $this->format      = 'pcm';
+        $this->sample_rate = '16000';
+        $this->timeout     = $this->config->get('alivms.timeout', 120);
     }
 
     /**
-     * @date   2019/1/24
+     * @date   2019/1/28
      * @author <zhufengwei@aliyun.com>
-     * @param array $query
+     *
+     * @param string $token
      *
      * @return $this
      */
-    public function setQuery(array $query)
+    public function setToken(string $token)
     {
-        $setable = [
-            'appkey',
-            'format',
-            'sample_rate',
-            'enable_punctuation_prediction',
-            'enable_inverse_text_normalization',
-            'enable_voice_detection'
-        ];
-
-        foreach ($query as $key => $value) {
-            if (in_array($key, $setable)) {
-                $this->query[$key] = $value;
-            }
-        }
+        $this->token = $token;
 
         return $this;
     }
@@ -107,6 +94,21 @@ class AliVms
     }
 
     /**
+     * @date   2019/1/28
+     * @author <zhufengwei@aliyun.com>
+     * @return string
+     */
+    private function getRequest(): string
+    {
+        return $this->uri . "?appkey={$this->appkey}"
+            . "&format={$this->format}"
+            . "&sample_rate={$this->sample_rate}"
+            . "&enable_punctuation_prediction={$this->enable_punctuation_prediction}"
+            . "&enable_inverse_text_normalization={$this->enable_inverse_text_normalization}"
+            . "&enable_voice_detection={$this->enable_voice_detection}";
+    }
+
+    /**
      * @date   2019/1/4
      * @author <zhufengwei@aliyun.com>
      *
@@ -114,42 +116,17 @@ class AliVms
      *
      * @return $this
      */
-    public function setHeader(string $token = '')
+    public function setHeader()
     {
+        if (!$this->token) {
+            throw new \Exception('Token Con\'t Be Null !');
+        }
+
         $this->headers = [
-            'X-NLS-Token'    => $token ?: AliOpenapi::getToken()->Id,
-            'Content-type'   => 'application/octet-stream',
-            'Content-Length' => strval(strlen(file_get_contents($this->file))),
-            'Host'           => $this->config->get('alivms.host') ?: 'nls-gateway.cn-shanghai.aliyuncs.com'
-        ];
-
-        return $this;
-    }
-
-    /**
-     * @date   2019/1/4
-     * @author <zhufengwei@aliyun.com>
-     *
-     * @param string $appkey
-     *
-     * @return $this
-     */
-    public function setOption(string $appkey = '')
-    {
-        $this->options = [
-            'multipart' => [
-                [
-                    'name'     => 'audio',
-                    'contents' => file_get_contents($this->file),
-                    'headers'  => $this->headers
-                ]
-            ],
-            'query'     => array_merge($this->query, [
-                'appkey' => $appkey ?: ($this->query['appkey'] ?: $this->setAppkey())
-            ]),
-
-            'timeout'   => $this->config->get('alivms.timeout'),
-            'headers'   => $this->headers
+            'X-NLS-Token:' . $this->token,
+            'Content-type:' . 'application/octet-stream',
+            'Content-Length:' . strval(strlen(file_get_contents($this->file))),
+            'Host:' . $this->config->get('alivms.host') ?: 'nls-gateway.cn-shanghai.aliyuncs.com'
         ];
 
         return $this;
@@ -184,21 +161,21 @@ class AliVms
      * @return mixed
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function voiceDetection(string $file = '')
+    public function voiceDetection(string $file = '', $token = '')
     {
+        if ($token) {
+            $this->setToken($token);
+        }
+
         if ($file) {
-            $this->setFile($file)->setHeader()->setOption();
+            $this->setFile($file)->setHeader();
         }
 
         try {
-            // first
-            $request  = new Request('POST', $this->config->get('alivms.uri'), $this->headers);
-            $response = $this->client->send($request, $this->options);
+            $request = $this->getRequest();
+            $response = $this->send($request);
 
-            // secounds
-            // $result = $this->client->request('POST', $this->config->get('alivms.uri'), $this->options);
-
-            return json_decode($response->getBody()->getContents());
+            return json_decode($response, true);
         } catch (\Exception $e) {
 
             $this->addlog('alivms', $this->config->get('alivms.uri'), [$file], $e->getMessage(), $e->getCode());
@@ -234,5 +211,64 @@ class AliVms
         });
 
         $logger->addError(self::BASENAME . $module);
+    }
+
+    /**
+     * @date   2019/1/28
+     * @author <zhufengwei@aliyun.com>
+     * @param string $request
+     */
+    public function send(string $request)
+    {
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($curl, CURLOPT_TIMEOUT, $this->timeout);
+        curl_setopt($curl, CURLOPT_URL, $request);
+        curl_setopt($curl, CURLOPT_POST, TRUE);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $this->headers);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, file_get_contents($this->file));
+        curl_setopt($curl, CURLOPT_NOBODY, FALSE);
+        $returnData = curl_exec($curl);
+        curl_close($curl);
+
+        return $returnData;
+    }
+
+    /**
+     * @date   2019/1/28
+     * @author <zhufengwei@aliyun.com>
+     *
+     * @param $name
+     * @param $value
+     *
+     * @throws \Exception
+     */
+    public function __set($name, $value)
+    {
+        if (in_array($name, $this->setable)) {
+            $this->query[$name] = $value;
+        }
+
+        $this->$name = $value;
+
+        return $this;
+    }
+
+    /**
+     * @date   2019/1/28
+     * @author <zhufengwei@aliyun.com>
+     *
+     * @param $name
+     *
+     * @return mixed
+     * @throws \Exception
+     */
+    public function __get($name)
+    {
+        if (in_array($name, $this->setable)) {
+            return $this->query[$name] ?? 'false';
+        }
+
+        return $this->$name;
     }
 }
