@@ -24,7 +24,7 @@ return [
     'uri'         => env('ALI_VMS_URI', 'http://nls-gateway.cn-shanghai.aliyuncs.com/stream/v1/asr'),  // Request Uri
     'appkey'      => env('ALI_VMS_APPKEY', ''),   // APP KEY                                      
     'host'        => env('ALI_VMS_HOST', 'nls-gateway.cn-shanghai.aliyuncs.com'),  // Host
-    'timeout'     => 3,
+    'timeout'     => 120,
     'log_file'    => storage_path('logs/alivms.log'), // Log File Path
     'log_channel' => 'ALI-VMS',
 ];
