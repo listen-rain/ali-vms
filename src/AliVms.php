@@ -9,6 +9,15 @@ use Monolog\Handler\StreamHandler;
 
 class AliVms
 {
+    /**
+     * @var \Listen\LogCollector\Logger
+     */
+    protected static $logger;
+
+    use CallbackTrait {
+        CallbackTrait::__construct as private callbackConstruct;
+    }
+
     const BASENAME = 'alivms.';
 
     /**
@@ -35,6 +44,11 @@ class AliVms
      * @var array
      */
     protected $query = [];
+
+    /**
+     * @var array
+     */
+    protected $exceptionCallbacks = [];
 
     /**
      * @var array
@@ -66,6 +80,8 @@ class AliVms
         $this->format      = 'pcm';
         $this->sample_rate = '16000';
         $this->timeout     = $this->config->get('alivms.timeout', 120);
+
+        $this->callbackConstruct();
     }
 
     /**
@@ -194,11 +210,15 @@ class AliVms
         try {
             $request  = $this->getRequest();
             $response = $this->send($request);
+            $result   = json_decode($response, true);
 
-            return json_decode($response, true);
+            if ($result['status'] !== 20000000) {
+                $this->applyCallback('alivms', $result['message'], $result['status']);
+            }
+
+            return $result;
         } catch (\Exception $e) {
-
-            $this->addlog('alivms', $this->config->get('alivms.uri'), [$file], $e->getMessage(), $e->getCode());
+            $this->applyCallback('alivms', $e->getMessage(), $e->getCode());
 
             return false;
         }
