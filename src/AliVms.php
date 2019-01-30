@@ -3,9 +3,8 @@
 namespace Listen\AliVms;
 
 use Illuminate\Config\Repository;
+use Listen\AliVms\Exceptions\AlivmsException;
 use Mockery\Exception;
-use Monolog\Logger;
-use Monolog\Handler\StreamHandler;
 
 class AliVms
 {
@@ -217,40 +216,11 @@ class AliVms
             }
 
             return $result;
-        } catch (\Exception $e) {
+        } catch (AlivmsException $e) {
             $this->applyCallback('alivms', $e->getMessage(), $e->getCode());
 
             return false;
         }
-    }
-
-    /**
-     * @date   2019/1/4
-     * @author <zhufengwei@aliyun.com>
-     *
-     * @param $module
-     * @param $uri
-     * @param $request
-     * @param $response
-     * @param $code
-     */
-    public function addlog(string $module, string $uri, array $request, string $response, int $code)
-    {
-        $logger    = new Logger($this->config->get('alivms.log_channel'));
-        $file_name = $this->config->get('alivms.log_file');
-
-        try {
-            $logger->pushHandler(new StreamHandler($file_name, Logger::INFO, false));
-        } catch (\Exception $e) {
-            $logger->info('pushHandlerError', $e->getMessage());
-        }
-
-        $logger->pushProcessor(function ($record) use ($request, $uri, $response, $code) {
-            $record['extra'] = compact('uri', 'request', 'response', 'code');
-            return $record;
-        });
-
-        $logger->addError(self::BASENAME . $module);
     }
 
     /**
