@@ -26,7 +26,8 @@ return [
     'host'        => env('ALI_VMS_HOST', 'nls-gateway.cn-shanghai.aliyuncs.com'),  // Host
     'timeout'     => 120,
     'log_file'    => storage_path('logs/alivms.log'), // Log File Path
-    'log_channel' => 'ALI-VMS',
+    'log_channel'  => env('ALIVMS_LOG_CHANNEL', 'alivms'),
+    'log_mode'     => env('ALIVMS_LOG_MODE', 'single')
 ];
 ```
 
@@ -54,6 +55,14 @@ dd(AliVms::voiceDetection($file->getRealPath()));
 
 # use file 
 dd(AliVms::voiceDetection('path/to/file.pcm'));
+```
+
+push Exception callback
+```
+\AliVms::pushExceptionCallback('dingtalk', function ($module, $message, $code, $otherParams) {
+    // https://github.com/listen-rain/dingtalk
+    sendByDingtalk($message . "\n\n Code: {$code}", "{$module}.error");
+});
 ```
 
 ## Contact Me
