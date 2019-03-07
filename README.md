@@ -1,6 +1,14 @@
 # Ali Vms
 Ali Vms Package For Laravel5
 
+[![Latest Stable Version](https://poser.pugx.org/listen/ali-vms/v/stable)](https://packagist.org/packages/listen/ali-vms)
+[![Total Downloads](https://poser.pugx.org/listen/ali-vms/downloads)](https://packagist.org/packages/listen/ali-vms)
+[![Latest Unstable Version](https://poser.pugx.org/listen/ali-vms/v/unstable)](https://packagist.org/packages/listen/ali-vms)
+[![License](https://poser.pugx.org/listen/ali-vms/license)](https://packagist.org/packages/listen/ali-vms)
+[![Monthly Downloads](https://poser.pugx.org/listen/ali-vms/d/monthly)](https://packagist.org/packages/listen/ali-vms)
+[![Daily Downloads](https://poser.pugx.org/listen/ali-vms/d/daily)](https://packagist.org/packages/listen/ali-vms)
+[![composer.lock](https://poser.pugx.org/listen/ali-vms/composerlock)](https://packagist.org/packages/listen/ali-vms)
+
 ## Usage
 
 Composer Install
